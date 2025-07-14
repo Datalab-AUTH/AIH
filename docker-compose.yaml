@@ -1,0 +1,8 @@
+version: '3'
+services:
+  streamlit-app:
+    build: .
+    container_name: aiaaic-harms
+    ports:
+      - 8515:8501
+    restart: always
