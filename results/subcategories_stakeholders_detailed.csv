@@ -1,0 +1,200 @@
+harm_subcategory,stakeholders,freq
+Addiction,General public,1
+Addiction,Users,2
+Alienation/isolation,Artists/content creators,1
+Alienation/isolation,General public,3
+Alienation/isolation,Users,2
+Alienation/isolation,Vulnerable groups,3
+Alienation/isolation,Workers,1
+Anxiety/distress,Artists/content creators,2
+Anxiety/distress,General public,13
+Anxiety/distress,Users,6
+Anxiety/distress,Vulnerable groups,4
+Anxiety/distress,Workers,1
+Anxiety/distress/depression,General public,6
+Anxiety/distress/depression,Government/public sector,3
+Anxiety/distress/depression,Users,11
+Anxiety/distress/depression,Vulnerable groups,11
+Anxiety/distress/depression,Workers,2
+Autonomy/agency loss,Artists/content creators,1
+Autonomy/agency loss,General public,2
+Autonomy/agency loss,Government/public sector,1
+Autonomy/agency loss,Users,13
+Autonomy/agency loss,Vulnerable groups,7
+Autonomy/agency loss,Workers,4
+Benefits/entitlements loss,Users,3
+Benefits/entitlements loss,Vulnerable groups,6
+Bodily injury,General public,4
+Bodily injury,Users,10
+Bodily injury,Vulnerable groups,15
+Business operations/infrastructure damage,Government/public sector,1
+Cheating/plagiarism,Users,1
+Coercion/manipulation,General public,3
+Coercion/manipulation,Users,3
+Coercion/manipulation,Vulnerable groups,1
+Confidentiality loss,Government/public sector,3
+Confidentiality loss,Users,2
+Critical infrastructure damage,Government/public sector,3
+Critical infrastructure damage,Vulnerable groups,1
+Damage to public health,General public,6
+Damage to public health,Government/public sector,1
+Defamation/libel/slander,Artists/content creators,4
+Defamation/libel/slander,Business,2
+Defamation/libel/slander,General public,5
+Defamation/libel/slander,Government/public sector,5
+Defamation/libel/slander,Users,5
+Defamation/libel/slander,Vulnerable groups,5
+Dehumanisation/objectification,Artists/content creators,2
+Dehumanisation/objectification,General public,6
+Dehumanisation/objectification,Users,5
+Dehumanisation/objectification,Vulnerable groups,6
+Dignity loss,Artists/content creators,1
+Dignity loss,General public,3
+Dignity loss,Government/public sector,2
+Dignity loss,Users,7
+Dignity loss,Vulnerable groups,8
+Dignity loss,Workers,2
+Discrimination,General public,9
+Discrimination,Government/public sector,4
+Discrimination,Subjects,2
+Discrimination,Users,6
+Discrimination,Vulnerable groups,20
+Economic instability,General public,1
+Economic instability,Government/public sector,1
+Economic/political power,General public,2
+Economic/political power,Government/public sector,2
+Electoral interference,Government/public sector,1
+Financial/earnings loss,Artists/content creators,6
+Financial/earnings loss,Business,5
+Financial/earnings loss,General public,5
+Financial/earnings loss,Government/public sector,3
+Financial/earnings loss,Investors,2
+Financial/earnings loss,Users,6
+Financial/earnings loss,Vulnerable groups,4
+Financial/earnings loss,Workers,4
+Harassment/abuse/intimidation,General public,4
+Harassment/abuse/intimidation,Users,1
+Harassment/abuse/intimidation,Vulnerable groups,2
+IP/copyright loss,Artists/content creators,7
+IP/copyright loss,General public,1
+IP/copyright loss,Users,3
+IP/copyright loss,Vulnerable groups,1
+Impersonation/identity theft,Artists/content creators,7
+Impersonation/identity theft,General public,2
+Impersonation/identity theft,Government/public sector,2
+Impersonation/identity theft,Users,5
+Impersonation/identity theft,Vulnerable groups,1
+Impersonation/identity theft,Workers,1
+Information ecosystem degradation,Artists/content creators,1
+Information ecosystem degradation,General public,12
+Institutional trust loss,General public,5
+Institutional trust loss,Government/public sector,8
+Institutional trust loss,Users,1
+Intimidation,Government/public sector,1
+Intimidation,Users,2
+Intimidation,Vulnerable groups,4
+Job loss/losses,Artists/content creators,5
+Job loss/losses,General public,4
+Job loss/losses,Workers,1
+Livelihood loss,Artists/content creators,4
+Livelihood loss,General public,3
+Livelihood loss,Users,3
+Livelihood loss,Vulnerable groups,3
+Livelihood loss,Workers,3
+Loss of confidence/trust,Artists/content creators,1
+Loss of confidence/trust,Business,3
+Loss of confidence/trust,General public,3
+Loss of confidence/trust,Government/public sector,16
+Loss of confidence/trust,Users,6
+Loss of confidence/trust,Vulnerable groups,2
+Loss of creativity/critical thinking,Artists/content creators,4
+Loss of creativity/critical thinking,Business,1
+Loss of creativity/critical thinking,General public,3
+Loss of creativity/critical thinking,Workers,1
+Loss of human rights and freedoms,General public,1
+Loss of human rights and freedoms,Government/public sector,4
+Loss of human rights and freedoms,Users,5
+Loss of human rights and freedoms,Vulnerable groups,8
+Loss of life,General public,5
+Loss of life,Users,7
+Loss of life,Vulnerable groups,12
+Loss of productivity,Business,4
+Loss of productivity,Government/public sector,6
+Loss of productivity,Workers,1
+Loss of right to due process,Subjects,1
+Loss of right to liberty and security,Subjects,2
+Loss of right to liberty and security,Vulnerable groups,2
+Loss/violation of human rights and freedoms,General public,10
+Loss/violation of human rights and freedoms,Government/public sector,4
+Loss/violation of human rights and freedoms,Users,4
+Loss/violation of human rights and freedoms,Vulnerable groups,9
+Opportunity loss,Artists/content creators,7
+Opportunity loss,Business,3
+Opportunity loss,General public,3
+Opportunity loss,Government/public sector,3
+Opportunity loss,Investors,1
+Opportunity loss,Workers,2
+Over-reliance,General public,1
+Over-reliance,Government/public sector,2
+Over-reliance,Users,3
+Over-reliance,Workers,1
+Personal health deterioration,General public,1
+Personal health deterioration,Users,3
+Personal health deterioration,Vulnerable groups,4
+Personality loss,Artists/content creators,2
+Personality loss,Users,4
+Personality loss,Vulnerable groups,1
+Personality rights loss,Artists/content creators,7
+Personality rights loss,General public,2
+Personality rights loss,Users,7
+Political instability,General public,6
+Political instability,Government/public sector,8
+Political instability,Vulnerable groups,1
+Political manipulation,General public,9
+Political manipulation,Government/public sector,5
+Political manipulation,Users,2
+Privacy loss,Artists/content creators,2
+Privacy loss,Business,1
+Privacy loss,General public,9
+Privacy loss,Government/public sector,7
+Privacy loss,Subjects,6
+Privacy loss,Users,29
+Privacy loss,Vulnerable groups,17
+Privacy loss,Workers,2
+Property damage,Users,1
+Property damage,Vulnerable groups,3
+Public service delivery deterioration,General public,9
+Public service delivery deterioration,Government/public sector,8
+Public service delivery deterioration,Users,1
+Public service delivery deterioration,Vulnerable groups,1
+Public service delivery deterioration,Workers,1
+Radicalisation,General public,1
+Radicalisation,Government/public sector,1
+Radicalisation,Subjects,1
+Radicalisation,Vulnerable groups,1
+Self-harm,General public,2
+Self-harm,Users,2
+Self-harm,Vulnerable groups,1
+Sexualisation,General public,2
+Sexualisation,Users,8
+Sexualisation,Vulnerable groups,3
+Societal destabilisation,General public,5
+Societal destabilisation,Government/public sector,4
+Societal destabilisation,Vulnerable groups,2
+Societal inequality,Business,1
+Societal inequality,General public,7
+Societal inequality,Government/public sector,1
+Societal inequality,Subjects,2
+Societal inequality,Vulnerable groups,4
+Societal inequality,Workers,1
+Stereotyping,Artists/content creators,1
+Stereotyping,Business,1
+Stereotyping,General public,6
+Stereotyping,Government/public sector,1
+Stereotyping,Subjects,1
+Stereotyping,Users,5
+Stereotyping,Vulnerable groups,7
+Violence/armed conflict,General public,1
+Violence/armed conflict,Government/public sector,1
+Violence/armed conflict,Users,2
+Violence/armed conflict,Vulnerable groups,5
