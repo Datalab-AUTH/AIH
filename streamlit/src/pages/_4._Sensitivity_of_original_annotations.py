@@ -8,9 +8,9 @@ import streamlit_utils as stut
 
 
 DEFAULT_SEVERITY = {
-        "Artists/content creators": 1, "General public": 9, "Government/public sector": 8,
-        "Users": 6, "Vulnerable groups": 7, "Workers": 5, "Business": 3, "Investors": 4,
-        "Subjects": 2
+        "Artists/content creators": 1, "Subjects": 2, "Business": 3,
+        "Investors": 4, "Workers": 5, "Users": 6, "Vulnerable groups": 7,
+        "Government/public sector": 8, "General public": 9
     }
 
 # --- Scenario Generation ----------------------------------------------------

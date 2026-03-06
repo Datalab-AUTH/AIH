@@ -99,9 +99,164 @@ def get_cumulative_df_categories(df, category_col):
 
 
 
+def compute_gini(df, category_col, default_severity=None):
+    """
+    Compute the classic Gini index using numeric or ordinal severities.
+    Gini = 1 - 2 * AUC of the Lorenz curve (x=cum freq share, y=cum severity share).
+    """
+    gini_vals = {}
+    for category in df[category_col].unique():
+        df_cat = df[df[category_col] == category].copy()
+        
+        if default_severity is not None:
+            missing = set(default_severity.keys()) - set(df_cat['stakeholders'])
+            if missing:
+                missing_rows = [{'stakeholders': s, 'freq': 0, 'severity': default_severity[s], category_col: category} for s in missing]
+                df_cat = pd.concat([df_cat, pd.DataFrame(missing_rows)], ignore_index=True)
+                
+        df_cat = df_cat.sort_values(by='severity')
+        
+        total_freq = df_cat['freq'].sum()
+        df_cat['cumulative_share_counts'] = df_cat['freq'].cumsum() / total_freq if total_freq > 0 else 0
+        
+        df_cat['weighted_severity'] = df_cat['freq'] * df_cat['severity']
+        total_weighted_severity = df_cat['weighted_severity'].sum()
+        if total_weighted_severity > 0:
+            df_cat['cumulative_severity_share'] = df_cat['weighted_severity'].cumsum() / total_weighted_severity
+        else:
+            df_cat['cumulative_severity_share'] = 0
+            
+        x_vals = [0] + df_cat['cumulative_share_counts'].tolist()
+        y_vals = [0] + df_cat['cumulative_severity_share'].tolist()
+        
+        auc = np.trapz(y=y_vals, x=x_vals)
+        gini_vals[category] = 1 - 2 * auc
+        
+    return pd.Series(gini_vals, name="Gini")
+
+def compute_pietra(df, category_col, default_severity=None):
+    """
+    Ordinal Pietra index (Robin Hood index) for each harm category.
+    P_i = max_k |F_k - k/M|  where F_k = cumulative frequency up to rank k.
+    Uses the same ordinal Lorenz curve as AIH (y = k/M).
+    """
+    pietra_vals = {}
+
+    for category in df[category_col].unique():
+        df_cat = df[df[category_col] == category].copy()
+
+        if default_severity is not None:
+            missing = set(default_severity.keys()) - set(df_cat['stakeholders'])
+            for s in missing:
+                df_cat = pd.concat([df_cat, pd.DataFrame([{
+                    'stakeholders': s, 'freq': 0,
+                    'severity': default_severity[s], category_col: category
+                }])], ignore_index=True)
+
+        df_cat = df_cat.sort_values(by='severity').reset_index(drop=True)
+        M = len(df_cat)
+        total_freq = df_cat['freq'].sum()
+        if total_freq == 0:
+            pietra_vals[category] = 0.0
+            continue
+
+        cum_freq = df_cat['freq'].cumsum() / total_freq          # F_k
+        ranks    = pd.Series(range(1, M + 1)) / M               # k/M
+        pietra_vals[category] = float(np.abs(cum_freq.values - ranks.values).max())
+
+    return pd.Series(pietra_vals, name="Pietra")
+
+
+def compute_theil(df, category_col, default_severity=None):
+    """
+    Theil T-index for each harm category using numeric severity values.
+    T = sum_j( p_j * (s_j/mu) * ln(s_j/mu) )   where p_j = f_j / sum(f).
+    Requires strictly positive severity values (s_j > 0).
+    """
+    theil_vals = {}
+
+    for category in df[category_col].unique():
+        df_cat = df[df[category_col] == category].copy()
+
+        if default_severity is not None:
+            missing = set(default_severity.keys()) - set(df_cat['stakeholders'])
+            for s in missing:
+                df_cat = pd.concat([df_cat, pd.DataFrame([{
+                    'stakeholders': s, 'freq': 0,
+                    'severity': default_severity[s], category_col: category
+                }])], ignore_index=True)
+
+        df_cat = df_cat.sort_values(by='severity').reset_index(drop=True)
+        total_freq = df_cat['freq'].sum()
+        if total_freq == 0:
+            theil_vals[category] = 0.0
+            continue
+
+        p   = df_cat['freq'] / total_freq                       # normalised weights
+        s   = df_cat['severity']
+        mu  = float((p * s).sum())                              # weighted mean severity
+        if mu == 0:
+            theil_vals[category] = 0.0
+            continue
+
+        # Only include rows with positive frequency and severity
+        mask   = (p > 0) & (s > 0)
+        ratio  = s[mask] / mu
+        theil  = float((p[mask] * ratio * np.log(ratio)).sum())
+        theil_vals[category] = theil
+
+    return pd.Series(theil_vals, name="Theil")
+
+
+def compute_atkinson(df, category_col, epsilon=0.5, default_severity=None):
+    """
+    Atkinson index for each harm category using numeric severity values.
+    For epsilon != 1:  A = 1 - (1/mu) * [sum_j p_j * s_j^(1-e)]^(1/(1-e))
+    For epsilon == 1:  A = 1 - exp(sum_j p_j * ln(s_j)) / mu
+    Higher A = more inequality. epsilon controls inequality aversion (default 0.5).
+    """
+    atkinson_vals = {}
+
+    for category in df[category_col].unique():
+        df_cat = df[df[category_col] == category].copy()
+
+        if default_severity is not None:
+            missing = set(default_severity.keys()) - set(df_cat['stakeholders'])
+            for s in missing:
+                df_cat = pd.concat([df_cat, pd.DataFrame([{
+                    'stakeholders': s, 'freq': 0,
+                    'severity': default_severity[s], category_col: category
+                }])], ignore_index=True)
+
+        df_cat = df_cat.sort_values(by='severity').reset_index(drop=True)
+        total_freq = df_cat['freq'].sum()
+        if total_freq == 0:
+            atkinson_vals[category] = 0.0
+            continue
+
+        p  = df_cat['freq'] / total_freq
+        s  = df_cat['severity']
+        mu = float((p * s).sum())
+        if mu == 0:
+            atkinson_vals[category] = 0.0
+            continue
+
+        mask = (p > 0) & (s > 0)
+        if epsilon == 1:
+            log_mean = float((p[mask] * np.log(s[mask])).sum())
+            ede = np.exp(log_mean)
+        else:
+            power_sum = float((p[mask] * (s[mask] ** (1 - epsilon))).sum())
+            ede = power_sum ** (1.0 / (1 - epsilon)) if power_sum > 0 else 0.0
+
+        atkinson_vals[category] = float(1 - ede / mu)
+
+    return pd.Series(atkinson_vals, name=f"Atkinson(ε={epsilon})")
+
+
 def plot_lorenz_curves_cumulative_probability(df, category_col, total_stakeholders=None, default_severity=None):
     """
-    Plot Lorenz curves using cumulative probability method and calculate Gini.
+    Plot Lorenz curves using cumulative probability method and calculate AIH.
     """
     fig = go.Figure()
     gini_vals = {}
@@ -122,18 +277,25 @@ def plot_lorenz_curves_cumulative_probability(df, category_col, total_stakeholde
 
         df_category = df_category.sort_values(by='severity')
 
-        # Compute cumulative shares
+        # Compute cumulative frequency share (x-axis, same as before)
         df_category['cumulative_share_counts'] = df_category['freq'].cumsum() / df_category['freq'].sum()
-        df_category['severity_rank'] = df_category['severity'].rank(method='first')
-        df_category['normalized_severity_rank'] = df_category['severity_rank'] / len(df_category)
 
-        # Extract X and Y values for Lorenz curve
+        # Compute cumulative SEVERITY SHARE (y-axis) — classic Gini Lorenz construction (non-derivative)
+        # y = cumulative share of (freq * severity), normalized by total
+        df_category['weighted_severity'] = df_category['freq'] * df_category['severity']
+        total_weighted_severity = df_category['weighted_severity'].sum()
+        if total_weighted_severity > 0:
+            df_category['cumulative_severity_share'] = df_category['weighted_severity'].cumsum() / total_weighted_severity
+        else:
+            df_category['cumulative_severity_share'] = 0
+
+        # Extract X and Y for classic Lorenz curve
         x_vals = [0] + df_category['cumulative_share_counts'].tolist()
-        y_vals = [0] + df_category['normalized_severity_rank'].tolist()
+        y_vals = [0] + df_category['cumulative_severity_share'].tolist()
 
-        # Compute AUC and Gini
+        # Compute AIH using classic Gini formula: 1 - 2*AUC
         auc = np.trapz(y=y_vals, x=x_vals)
-        gini_vals[category] = auc
+        gini_vals[category] = 1 - 2 * auc
 
         # Add Lorenz curve to the figure
         fig.add_trace(go.Scatter(
@@ -165,7 +327,7 @@ def plot_lorenz_curves_cumulative_probability(df, category_col, total_stakeholde
         ),
         yaxis=dict(
             title=dict(
-                text="Cumulative Probability",
+                text="Cumulative Share of Severity",
                 font=dict(size=22, weight='bold')
             ),
             tickfont=dict(size=22, color='#666666'),
@@ -188,7 +350,7 @@ def plot_lorenz_curves_cumulative_probability(df, category_col, total_stakeholde
 
 def plot_mean_gini_scatter(mean_gini_method1, mean_gini_method2, categories, lorenz_curve_figure):
     """
-    Create a scatter plot comparing Gini indices for two methods.
+    Create a scatter plot comparing AIH indices for two methods.
     Automatically match dot colors to the Lorenz curve colors.
     """
     fig = go.Figure()
@@ -374,11 +536,16 @@ def plot_mean_errorbar_with_var(df):
 
 def plot_gini_vs_criticality(gini_series, criticality_series):
     """
-    Scatter plot comparing Gini (ordinal) vs Criticality Index
+    Scatter plot comparing AIH (ordinal) vs Criticality Index
     with on-chart labels, and axis fonts matching other plots.
     """
     fig = go.Figure()
-    max_val = max(gini_series.max(), criticality_series.max()) + 0.05
+    
+    # AIH is now a classic Gini value in [0, 1]; CI also in [0, 1]
+    aih_min = min(gini_series.min(), 0) - 0.05
+    aih_max = max(gini_series.max(), 1.0) + 0.05
+    ci_min  = min(criticality_series.min(), 0) - 0.05
+    ci_max  = max(criticality_series.max(), 1.0) + 0.05
 
     # cycle through these positions for label placement:
     positions = ['top center', 'bottom center', 'middle right', 'middle left']
@@ -399,9 +566,10 @@ def plot_gini_vs_criticality(gini_series, criticality_series):
             showlegend=False
         ))
 
-    # 45° reference line (hidden from legend)
+    # 45° reference line
     fig.add_trace(go.Scatter(
-        x=[0, max_val], y=[0, max_val],
+        x=[min(ci_min, aih_min), max(ci_max, aih_max)],
+        y=[min(ci_min, aih_min), max(ci_max, aih_max)],
         mode='lines',
         line=dict(dash='dash', color='gray'),
         showlegend=False
@@ -414,7 +582,7 @@ def plot_gini_vs_criticality(gini_series, criticality_series):
                 font=dict(size=23, weight='bold')
             ),
             tickfont=dict(size=22, color='#666666'),
-            range=[0, max_val],
+            range=[ci_min, ci_max],
             showgrid=True,
             gridcolor='#DDDDDD'
         ),
@@ -424,7 +592,7 @@ def plot_gini_vs_criticality(gini_series, criticality_series):
                 font=dict(size=23, weight='bold')
             ),
             tickfont=dict(size=22, color='#666666'),
-            range=[0, max_val],
+            range=[aih_min, aih_max],
             showgrid=True,
             gridcolor='#DDDDDD'
         ),

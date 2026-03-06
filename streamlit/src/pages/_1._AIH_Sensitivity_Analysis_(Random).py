@@ -11,7 +11,7 @@ PAGE_TITLE = "Sensitivity Analysis: AIH vs Criticality Index"
 stut.set_page_config(PAGE_TITLE)
 
 st.markdown("""
-### Sensitivity Analysis: AIH<sub>ord</sub> vs Criticality Index  
+### Sensitivity Analysis: AIH vs Criticality Index  
 We draw 10 random “severity” scenarios, then for each:
 1. Compute the **AIH** (via our Lorenz‐curve/AUC method).  
 2. Compute the **Criticality Index** (mean of cumulative shares Fₖ).  
@@ -49,7 +49,7 @@ st.dataframe(severity_df)
 def get_mapping(col):
     return dict(zip(severity_df["stakeholders"], severity_df[col]))
 
-# ─── METHOD 1: AIHₒᵣᵈ Gini ─────────────────────────────────────────────────────
+# ─── METHOD 1: AIH Gini ─────────────────────────────────────────────────────
 st.markdown("## Method 1: AIH", unsafe_allow_html=True)
 
 def calculate_gini_indices(base_df):

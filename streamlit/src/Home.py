@@ -31,17 +31,17 @@ severity_case = st.selectbox("Select Severity Case", ["Original (1-9)", "Severit
 # Map severities based on selected case
 if severity_case == "Original (1-9)":
     DEFAULT_SEVERITY = {
-        "Artists/content creators": 1, "General public": 9, "Government/public sector": 8,
-        "Users": 6, "Vulnerable groups": 7, "Workers": 5, "Business": 3, "Investors": 4,
-        "Subjects": 2
+        "Artists/content creators": 1, "Subjects": 2, "Business": 3,
+        "Investors": 4, "Workers": 5, "Users": 6, "Vulnerable groups": 7,
+        "Government/public sector": 8, "General public": 9
     }
     MAX_SEVERITY = 10
     step_value = 1
 else:
     DEFAULT_SEVERITY = {
-        "Artists/content creators": 50, "General public": 450, "Government/public sector": 400,
-        "Users": 300, "Vulnerable groups": 350, "Workers": 250, "Business": 150, "Investors": 200,
-        "Subjects": 100
+        "General public": 50, "Government/public sector": 100,
+        "Vulnerable groups": 150, "Users": 200, "Workers": 250, "Investors": 300,
+        "Business": 350, "Subjects": 400, "Artists/content creators": 450
     }
     MAX_SEVERITY = 450
     step_value = 50
@@ -183,20 +183,135 @@ st.dataframe(df_criticality_index)
 
 
 st.markdown(
-    "<hr style='"
-    "border: none;"
-    "height: 4px;"          # thickness
-    "background-color: #333;"  # color
-    "margin: 2rem 0;"       # vertical spacing
-    "'/>",
+    "<hr style='border:none;height:4px;background-color:#333;margin:2rem 0;'/>",
     unsafe_allow_html=True
 )
-st.markdown("### Scatter Plot: AIH vs Criticality Index")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Additional inequality metrics: Pietra, Theil, Atkinson, Gini (numeric)
+# ─────────────────────────────────────────────────────────────────────────────
+st.markdown("### Additional Inequality Metrics")
+st.markdown(
+    "**AIH & Pietra** use *ordinal* severities (already defined above). "
+    "**Gini, Theil, & Atkinson** additionally use *numeric* severities with meaningful distances. "
+    "Both scales share the same **ordering** of stakeholders — only the spacing changes."
+)
+
+# ── Default numeric severity (equal spacing, same ordering as ordinal) ───────
+DEFAULT_NUMERIC_SEVERITY = {
+    "General public": 1,
+    "Government/public sector": 5,
+    "Vulnerable groups": 10,
+    "Users": 15,
+    "Workers": 20,
+    "Investors": 25,
+    "Business": 30,
+    "Subjects": 35,
+    "Artists/content creators": 40,
+}
+
+# ── Editable severity inputs ─────────────────────────────────────────────────
+# Stakeholders in ordinal order (lowest → highest vulnerability)
+ordered_stakeholders = [
+    "General public", "Government/public sector", "Vulnerable groups",
+    "Users", "Workers", "Investors", "Business", "Subjects",
+    "Artists/content creators"
+]
+
+with st.expander("⚙️ Review & edit severity scales used for each metric"):
+    st.markdown("**Ordinal severities (AIH, Pietra, CI)** — change in the panel at the top of this page.")
+    st.markdown("**Numeric severities (Gini, Theil, Atkinson)** — edit below:")
+    num_sev_cols = st.columns(3)
+    numeric_severity_user = {}
+    for idx, stakeholder in enumerate(ordered_stakeholders):
+        col = num_sev_cols[idx % 3]
+        numeric_severity_user[stakeholder] = col.number_input(
+            label=stakeholder,
+            value=float(DEFAULT_NUMERIC_SEVERITY.get(stakeholder, 1)),
+            step=1.0,
+            min_value=0.001,
+            key=f"num_sev_{stakeholder}"
+        )
+
+NUMERIC_SEVERITY = numeric_severity_user
+
+import plotly.graph_objs as go
+
+# ── Build df with numeric severities ─────────────────────────────────────────
+df_numeric = df_with_cumulative.copy()
+df_numeric['severity'] = df_numeric['stakeholders'].map(NUMERIC_SEVERITY)
+
+# ── Compute metrics ───────────────────────────────────────────────────────────
+df_pietra   = stut.compute_pietra(df_with_cumulative, category_col, default_severity=DEFAULT_SEVERITY)
+df_gini_num = stut.compute_gini(df_numeric, category_col, default_severity=NUMERIC_SEVERITY)
+df_theil    = stut.compute_theil(df_numeric, category_col, default_severity=NUMERIC_SEVERITY)
+df_atkinson = stut.compute_atkinson(df_numeric, category_col, epsilon=0.5, default_severity=NUMERIC_SEVERITY)
+
+# ── Combined summary table ────────────────────────────────────────────────────
+st.markdown("#### Summary: all inequality metrics")
+df_summary = pd.DataFrame({
+    "AIH":              df_gini_probability.round(4),
+    "Pietra":           df_pietra.round(4),
+    "Gini(numeric)":    df_gini_num.round(4),
+    "Theil":            df_theil.round(4),
+    "Atkinson(ε=0.5)":  df_atkinson.round(4),
+    "CI":               df_criticality_index.round(4),
+})
+df_summary.index.name = "Harm Category"
+st.dataframe(df_summary, use_container_width=True)
+
+# ── Metrics Comparison Chart ─────────────────────────────────────────────────
+fig_metrics = go.Figure()
+colors = ['#1f77b4', '#ff7f0e', '#8c564b', '#2ca02c', '#d62728', '#9467bd']
+for idx, col in enumerate(df_summary.columns):
+    fig_metrics.add_trace(go.Bar(
+        name=col,
+        x=df_summary.index,
+        y=df_summary[col],
+        marker_color=colors[idx % len(colors)]
+    ))
+
+fig_metrics.update_layout(
+    title="Comparison of Inequality Metrics by Harm Category",
+    barmode="group",
+    xaxis={'categoryorder':'total descending'},
+    legend=dict(title="Metrics", orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    height=500,
+    plot_bgcolor="white",
+    hovermode="x unified"
+)
+fig_metrics.update_yaxes(showgrid=True, gridcolor="#DDDDDD")
+st.plotly_chart(fig_metrics, use_container_width=True, key="metrics_comparison_chart")
 
 
+# ── Interactive Scatter Plot ──────────────────────────────────────────────────
+st.markdown("#### Interactive Metric Comparison")
+st.markdown("Select two metrics to compare them in a scatter plot.")
 
-scatter_gini_ci = stut.plot_gini_vs_criticality(df_gini_probability, df_criticality_index)
-st.plotly_chart(scatter_gini_ci, key="gini_vs_ci")
+metrics_list = list(df_summary.columns)
+col1, col2 = st.columns(2)
+with col1:
+    x_metric = st.selectbox("X-axis Metric", options=metrics_list, index=metrics_list.index("CI") if "CI" in metrics_list else 0)
+with col2:
+    y_metric = st.selectbox("Y-axis Metric", options=metrics_list, index=metrics_list.index("AIH") if "AIH" in metrics_list else 1)
+
+scatter_interactive = stut.plot_gini_vs_criticality(
+    df_summary[y_metric], 
+    df_summary[x_metric]
+)
+# Update layout to deeply override the hardcoded axis titles from the utility
+scatter_interactive.update_layout(
+    title=f"Scatter Plot: {y_metric} vs {x_metric}",
+    xaxis=dict(
+        title=dict(text=x_metric, font=dict(size=23, weight='bold'))
+    ),
+    yaxis=dict(
+        title=dict(text=y_metric, font=dict(size=23, weight='bold'))
+    )
+)
+st.plotly_chart(scatter_interactive, use_container_width=True, key="interactive_scatter_chart")
+
+
 
 
 

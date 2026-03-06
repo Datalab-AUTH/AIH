@@ -11,9 +11,9 @@ import plotly.express as px
 
 # Modify the DEFAULT_SEVERITY dictionary to align with the Home page script
 DEFAULT_SEVERITY = {
-    "Artists/content creators": 1, "General public": 9, "Government/public sector": 8,
-    "Users": 6, "Vulnerable groups": 7, "Workers": 5, "Business": 3, "Investors": 4,
-    "Subjects": 2
+    "Artists/content creators": 1, "Subjects": 2, "Business": 3,
+    "Investors": 4, "Workers": 5, "Users": 6, "Vulnerable groups": 7,
+    "Government/public sector": 8, "General public": 9
 }
 @st.cache_data(show_spinner=False)
 def calculate_mean_gini_across_permutations(scenarios, gini_dict):
@@ -684,12 +684,12 @@ plot_gini_boxplots_for_scenarios_with_no_permutations_v2(
     gini_scenario_dict_method1,
     mean_gini_no_permutations_method1,
     selected_category_method1,
-    #title=f"Gini Distribution for {selected_category_method1} Across Scenarios (Method 1, Including No Permutations)",
+    #title=f"AIH Distribution for {selected_category_method1} Across Scenarios (Method 1, Including No Permutations)",
     unique_key="boxplot_harm_category_with_no_permutations_method1_v2"
 )
 
 # plot “mean Gini” sensitivity for Method 1
-st.markdown("### Mean Gini Sensitivity Across Scenarios (Method 1)")
+st.markdown("### Mean AIH Sensitivity Across Scenarios (Method 1)")
 plot_gini_sensitivity_with_ci_for_scenarios(
     mean_gini_df_method1,
     ci_df_method1,
@@ -700,7 +700,7 @@ plot_gini_sensitivity_with_ci_for_scenarios(
 # ─── SPEARMAN RANK CORRELATION HEATMAP ──────────────────────────────────────
 
 # Add a markdown header like your other sections
-st.markdown("### Spearman ρ between Scenarios (Gini Index)")
+st.markdown("### Spearman ρ between Scenarios (AIH)")
 
 
 # 1. compute correlation matrix

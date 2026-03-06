@@ -7,11 +7,11 @@ import plotly.graph_objs as go
 import streamlit_utils as stut
 
 # ─── PAGE CONFIG ─────────────────────────────────────────────────────────────
-PAGE_TITLE = "Sensitivity of actual values of severity (Ordinal Gini vs Criticality Index)"
+PAGE_TITLE = "Sensitivity of actual values of severity (Ordinal AIH vs Criticality Index)"
 stut.set_page_config(PAGE_TITLE)
 
 st.markdown("""
-### Sensitivity Analysis of Gini Index (AIH) and Criticality Index  
+### Sensitivity Analysis of AIH and Criticality Index  
 Here we draw 20 exponential‐cumulated severity scenarios per stakeholder, then:
 1. Compute **Method 1: AIH**  
 2. Compute **Method 2: Criticality Index**  
@@ -152,8 +152,8 @@ def plot_box_with_ref(df_vals, ref_series, line_label, ylabel):
     )
     return fig
 
-st.markdown("### Box plots with Reference Gini")
-st.plotly_chart(plot_box_with_ref(gini_df, gini_ref, "Reference Gini", "Gini Index"))
+st.markdown("### Box plots with Reference AIH")
+st.plotly_chart(plot_box_with_ref(gini_df, gini_ref, "Reference AIH", "AIH"))
 
 st.markdown(
     "<hr style='"
