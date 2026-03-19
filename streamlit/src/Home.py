@@ -199,15 +199,15 @@ st.markdown(
 
 # ── Default numeric severity (equal spacing, same ordering as ordinal) ───────
 DEFAULT_NUMERIC_SEVERITY = {
-    "General public": 1,
-    "Government/public sector": 5,
-    "Vulnerable groups": 10,
-    "Users": 15,
-    "Workers": 20,
-    "Investors": 25,
-    "Business": 30,
-    "Subjects": 35,
-    "Artists/content creators": 40,
+    "Artists/content creators": 1,
+    "Subjects": 2,
+    "Business": 3,
+    "Investors": 4,
+    "Workers": 5,
+    "Users": 6,
+    "Vulnerable groups": 7,
+    "Government/public sector": 8,
+    "General public": 9,
 }
 
 # ── Editable severity inputs ─────────────────────────────────────────────────
