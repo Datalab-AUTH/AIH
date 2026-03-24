@@ -130,8 +130,8 @@ def compute_gini(df, category_col, default_severity=None):
         y_vals = [0] + df_cat['cumulative_severity_share'].tolist()
         
         auc = np.trapz(y=y_vals, x=x_vals)
-        # Convert Gini to 1 - Gini to correlate with CI: 1 - (1 - 2*auc) = 2*auc
-        gini_vals[category] = 2 * auc
+        # Compute AIH as raw AUC
+        gini_vals[category] = auc
         
     return pd.Series(gini_vals, name="Gini")
 
@@ -294,9 +294,9 @@ def plot_lorenz_curves_cumulative_probability(df, category_col, total_stakeholde
         x_vals = [0] + df_category['cumulative_share_counts'].tolist()
         y_vals = [0] + df_category['cumulative_severity_share'].tolist()
 
-        # Compute AIH using 1 - Gini formula: 1 - (1 - 2*AUC) = 2*AUC
+        # Compute AIH as raw AUC
         auc = np.trapz(y=y_vals, x=x_vals)
-        gini_vals[category] = 2 * auc
+        gini_vals[category] = auc
 
         # Add Lorenz curve to the figure
         fig.add_trace(go.Scatter(
