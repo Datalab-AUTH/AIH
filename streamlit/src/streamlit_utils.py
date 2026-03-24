@@ -101,8 +101,8 @@ def get_cumulative_df_categories(df, category_col):
 
 def compute_gini(df, category_col, default_severity=None):
     """
-    Compute the classic Gini index using numeric or ordinal severities.
-    Gini = 1 - 2 * AUC of the Lorenz curve (x=cum freq share, y=cum severity share).
+    Compute AIH using numeric or ordinal severities.
+    AIH = AUC of the Lorenz curve (x=cum freq share, y=cum severity share).
     """
     gini_vals = {}
     for category in df[category_col].unique():
@@ -130,8 +130,8 @@ def compute_gini(df, category_col, default_severity=None):
         y_vals = [0] + df_cat['cumulative_severity_share'].tolist()
         
         auc = np.trapz(y=y_vals, x=x_vals)
-        # Convert Gini to 1 - Gini to correlate with CI: 1 - (1 - 2*auc) = 2*auc
-        gini_vals[category] = 2 * auc
+        # Use simple AUC
+        gini_vals[category] = auc
         
     return pd.Series(gini_vals, name="Gini")
 
@@ -294,9 +294,9 @@ def plot_lorenz_curves_cumulative_probability(df, category_col, total_stakeholde
         x_vals = [0] + df_category['cumulative_share_counts'].tolist()
         y_vals = [0] + df_category['cumulative_severity_share'].tolist()
 
-        # Compute AIH using 1 - Gini formula: 1 - (1 - 2*AUC) = 2*AUC
+        # Compute AIH using AUC
         auc = np.trapz(y=y_vals, x=x_vals)
-        gini_vals[category] = 2 * auc
+        gini_vals[category] = auc
 
         # Add Lorenz curve to the figure
         fig.add_trace(go.Scatter(
@@ -368,9 +368,9 @@ def plot_mean_gini_scatter(mean_gini_method1, mean_gini_method2, categories, lor
             mode='markers+text',
             text=[category],
             textposition='top center',
-            textfont=dict(size=19),
+            textfont=dict(size=26),
             marker=dict(
-                size=16,
+                size=22,
                 color=color,
                 line=dict(width=0, color='white')
             ),
@@ -392,10 +392,10 @@ def plot_mean_gini_scatter(mean_gini_method1, mean_gini_method2, categories, lor
         xaxis=dict(
             title=dict(
                 text="AIH",
-                font=dict(size=23, weight='bold'),
+                font=dict(size=30, weight='bold'),
 
             ),
-            tickfont=dict(size=22, color='#666666'),
+            tickfont=dict(size=26, color='#666666'),
             showgrid=True,
             gridcolor='#DDDDDD',
             range=[0, max_gini]
@@ -403,24 +403,24 @@ def plot_mean_gini_scatter(mean_gini_method1, mean_gini_method2, categories, lor
         yaxis=dict(
             title=dict(
                 text="AIH",
-                font=dict(size=23, weight='bold'),
+                font=dict(size=30, weight='bold'),
             ),
-            tickfont=dict(size=22, color='#666666'),
+            tickfont=dict(size=26, color='#666666'),
             showgrid=True,
             gridcolor='#DDDDDD',
             range=[0, max_gini]
         ),
         legend=dict(
-            font=dict(size=20),
+            font=dict(size=24),
             bgcolor='rgba(255, 255, 255, 0.8)',
             bordercolor='#DDDDDD',
             borderwidth=1
         ),
         plot_bgcolor='rgba(0, 0, 0, 0)',
         paper_bgcolor='rgba(255, 255, 255, 1)',
-        margin=dict(l=50, r=50, t=60, b=50),
-        width=1350,
-        height=980
+        margin=dict(l=60, r=60, t=70, b=60),
+        width=1000,
+        height=1000
     )
 
     return fig
@@ -559,10 +559,10 @@ def plot_gini_vs_criticality(gini_series, criticality_series):
             x=[x],
             y=[y],
             mode='markers+text',
-            marker=dict(size=16),
+            marker=dict(size=22),
             text=[cat],
             textposition=pos,
-            textfont=dict(size=18),
+            textfont=dict(size=26),
             name=cat,
             showlegend=False
         ))
@@ -580,9 +580,9 @@ def plot_gini_vs_criticality(gini_series, criticality_series):
         xaxis=dict(
             title=dict(
                 text="Criticality Index",
-                font=dict(size=23, weight='bold')
+                font=dict(size=30, weight='bold')
             ),
-            tickfont=dict(size=22, color='#666666'),
+            tickfont=dict(size=26, color='#666666'),
             range=[ci_min, ci_max],
             showgrid=True,
             gridcolor='#DDDDDD'
@@ -590,23 +590,23 @@ def plot_gini_vs_criticality(gini_series, criticality_series):
         yaxis=dict(
             title=dict(
                 text="AIH",
-                font=dict(size=23, weight='bold')
+                font=dict(size=30, weight='bold')
             ),
-            tickfont=dict(size=22, color='#666666'),
+            tickfont=dict(size=26, color='#666666'),
             range=[aih_min, aih_max],
             showgrid=True,
             gridcolor='#DDDDDD'
         ),
-        width=1350,
-        height=980,
+        width=1000,
+        height=1000,
         plot_bgcolor='white',
         legend=dict(
-            font=dict(size=20),
+            font=dict(size=24),
             bgcolor='rgba(255,255,255,0.8)',
             bordercolor='#DDD',
             borderwidth=1
         ),
-        margin=dict(l=50, r=50, t=60, b=50)
+        margin=dict(l=60, r=60, t=70, b=60)
     )
 
     return fig
