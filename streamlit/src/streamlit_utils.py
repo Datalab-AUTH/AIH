@@ -119,15 +119,11 @@ def compute_gini(df, category_col, default_severity=None):
         total_freq = df_cat['freq'].sum()
         df_cat['cumulative_share_counts'] = df_cat['freq'].cumsum() / total_freq if total_freq > 0 else 0
         
-        df_cat['weighted_severity'] = df_cat['freq'] * df_cat['severity']
-        total_weighted_severity = df_cat['weighted_severity'].sum()
-        if total_weighted_severity > 0:
-            df_cat['cumulative_severity_share'] = df_cat['weighted_severity'].cumsum() / total_weighted_severity
-        else:
-            df_cat['cumulative_severity_share'] = 0
+        df_cat['severity_rank'] = df_cat['severity'].rank(method='first')
+        df_cat['normalized_severity_rank'] = df_cat['severity_rank'] / len(df_cat)
             
         x_vals = [0] + df_cat['cumulative_share_counts'].tolist()
-        y_vals = [0] + df_cat['cumulative_severity_share'].tolist()
+        y_vals = [0] + df_cat['normalized_severity_rank'].tolist()
         
         auc = np.trapz(y=y_vals, x=x_vals)
         # Compute AIH simply as AUC
@@ -281,18 +277,12 @@ def plot_lorenz_curves_cumulative_probability(df, category_col, total_stakeholde
         # Compute cumulative frequency share (x-axis, same as before)
         df_category['cumulative_share_counts'] = df_category['freq'].cumsum() / df_category['freq'].sum()
 
-        # Compute cumulative SEVERITY SHARE (y-axis) — classic Gini Lorenz construction (non-derivative)
-        # y = cumulative share of (freq * severity), normalized by total
-        df_category['weighted_severity'] = df_category['freq'] * df_category['severity']
-        total_weighted_severity = df_category['weighted_severity'].sum()
-        if total_weighted_severity > 0:
-            df_category['cumulative_severity_share'] = df_category['weighted_severity'].cumsum() / total_weighted_severity
-        else:
-            df_category['cumulative_severity_share'] = 0
+        df_category['severity_rank'] = df_category['severity'].rank(method='first')
+        df_category['normalized_severity_rank'] = df_category['severity_rank'] / len(df_category)
 
         # Extract X and Y for classic Lorenz curve
         x_vals = [0] + df_category['cumulative_share_counts'].tolist()
-        y_vals = [0] + df_category['cumulative_severity_share'].tolist()
+        y_vals = [0] + df_category['normalized_severity_rank'].tolist()
 
         # Compute AIH simply as AUC
         auc = np.trapz(y=y_vals, x=x_vals)
@@ -328,7 +318,7 @@ def plot_lorenz_curves_cumulative_probability(df, category_col, total_stakeholde
         ),
         yaxis=dict(
             title=dict(
-                text="Cumulative Share of Severity",
+                text="Cumulative Probability",
                 font=dict(size=22, weight='bold')
             ),
             tickfont=dict(size=22, color='#666666'),
