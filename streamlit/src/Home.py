@@ -252,7 +252,7 @@ st.markdown("#### Summary: all inequality metrics")
 df_summary = pd.DataFrame({
     "AIH":              df_gini_probability.round(4),
     "Pietra":           df_pietra.round(4),
-    "Gini(numeric)":    df_gini_num.round(4),
+    "Gini":             df_gini_num.round(4),
     "Theil":            df_theil.round(4),
     "Atkinson(ε=0.5)":  df_atkinson.round(4),
     "CI":               df_criticality_index.round(4),
@@ -261,26 +261,64 @@ df_summary.index.name = "Harm Category"
 st.dataframe(df_summary, use_container_width=True)
 
 # ── Metrics Comparison Chart ─────────────────────────────────────────────────
+st.markdown("#### Comparison of Inequality Metrics by Harm Category")
 fig_metrics = go.Figure()
-colors = ['#1f77b4', '#ff7f0e', '#8c564b', '#2ca02c', '#d62728', '#9467bd']
+# Modern, vibrant palette inspired by Tailwind CSS
+colors = ['#3B82F6', '#F59E0B', '#10B981', '#8B5CF6', '#EF4444', '#06B6D4']
+
 for idx, col in enumerate(df_summary.columns):
     fig_metrics.add_trace(go.Bar(
         name=col,
         x=df_summary.index,
         y=df_summary[col],
-        marker_color=colors[idx % len(colors)]
+        marker_color=colors[idx % len(colors)],
+        marker_line=dict(width=1, color='white'),
+        opacity=0.95,
+        hovertemplate="%{y:.3f}<extra></extra>"
     ))
 
 fig_metrics.update_layout(
-    title="Comparison of Inequality Metrics by Harm Category",
+    font=dict(family="Inter, Roboto, sans-serif", size=14, color="#374151"),
     barmode="group",
     xaxis={'categoryorder':'total descending'},
-    legend=dict(title="Metrics", orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-    height=500,
-    plot_bgcolor="white",
-    hovermode="x unified"
+    legend=dict(
+        title=dict(text="<b>Metrics</b>"),
+        orientation="h",
+        yanchor="bottom",
+        y=1.08,
+        xanchor="center",
+        x=0.5,
+        bgcolor="rgba(255,255,255,0.9)",
+        bordercolor="#E5E7EB",
+        borderwidth=1
+    ),
+    height=550,
+    plot_bgcolor="rgba(0,0,0,0)",
+    paper_bgcolor="rgba(0,0,0,0)",
+    hovermode="x unified",
+    margin=dict(t=120, b=40, l=40, r=40)
 )
-fig_metrics.update_yaxes(showgrid=True, gridcolor="#DDDDDD")
+
+fig_metrics.update_xaxes(
+    showline=True,
+    linewidth=2,
+    linecolor='#D1D5DB',
+    tickfont=dict(size=12, color="#4B5563"),
+    showgrid=False
+)
+
+fig_metrics.update_yaxes(
+    showline=True,
+    linewidth=2,
+    linecolor='#D1D5DB',
+    showgrid=True,
+    gridcolor="#E5E7EB",
+    gridwidth=1,
+    tickfont=dict(size=12, color="#4B5563"),
+    zeroline=True,
+    zerolinecolor="#D1D5DB",
+    zerolinewidth=2
+)
 st.plotly_chart(fig_metrics, use_container_width=True, key="metrics_comparison_chart")
 
 
